@@ -42,7 +42,7 @@ def run():
 
 	key_str_readable = '-'.join(chunks(key_str, 4))
 
-	print(key_str_readable)
+	print(key_str)
 
 if __name__ == '__main__':
 	run()
