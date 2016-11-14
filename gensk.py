@@ -30,9 +30,9 @@ def get_key_length_from_command_line():
 # http://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks-in-python
 #
 def chunks(l, n):
-    """Yield successive n-sized chunks from l."""
-    for i in xrange(0, len(l), n):
-        yield l[i:i+n]
+	"""Yield successive n-sized chunks from l."""
+	for i in range(0, len(l), n):
+		yield l[i:i+n]
 
 def run():
 	key_length = get_key_length_from_command_line()
@@ -40,7 +40,7 @@ def run():
 	
 	key_str = gen_urandom_hex_str(key_length).upper()
 
-	key_str_readable = '-'.join(chunks(key_str, 4))
+	key_str_readable = b'-'.join(chunks(key_str, 4))
 
 	print(key_str_readable)
 
