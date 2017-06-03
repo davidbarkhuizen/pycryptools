@@ -31,7 +31,7 @@ def get_key_length_from_command_line():
 #
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
-    for i in xrange(0, len(l), n):
+    for i in range(0, len(l), n):
         yield l[i:i+n]
 
 def run():
@@ -40,7 +40,9 @@ def run():
 	
 	key_str = gen_urandom_hex_str(key_length).upper()
 
-	key_str_readable = '-'.join(chunks(key_str, 4))
+	print(bytes.decode(key_str))
+
+	key_str_readable = '-'.join(bytes.decode(x) for x in chunks(key_str, 4))
 
 	print(key_str_readable)
 
