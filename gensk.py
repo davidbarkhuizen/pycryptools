@@ -43,7 +43,6 @@ def run():
 	print(bytes.decode(key_str))
 
 	key_str_readable = '-'.join(bytes.decode(x) for x in chunks(key_str, 4))
-
 	print(key_str_readable)
 
 if __name__ == '__main__':
