@@ -1,5 +1,10 @@
 import os
 import binascii
+import base64
+
+KEY_LENGTH_MIN_BYTES=8
+KEY_LENGTH_MAX_BYTES=64
+KEY_LENGTH_REQS_DESCRIPTION=f'key length >= {KEY_LENGTH_MIN_BYTES} and <= key length <= {KEY_LENGTH_MAX_BYTES}'
 
 def gen_urandom_hex_str(byte_length):
 	byte_array = os.urandom(byte_length)
@@ -11,39 +16,41 @@ def gen_urandom_hex_str(byte_length):
 import argparse
 
 def get_key_length_from_command_line():
-	"""returns None on failure"""
+	'''returns None on failure'''
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument("length")
+	
+	parser.add_argument("key_length")
 	args = parser.parse_args()
 
-	length_str = args.length
-	length = None
+	key_length = None
 	try:
-		length = int(length_str) 
-		print('{0} byte key'.format(length))
+		key_length = int(args.key_length)
+		print(f'{key_length} byte key')
 	except Exception as e:
-		print('invalid key length: {0}', length_str)
+		print(f'invalid key length: {args.key_length}. {KEY_LENGTH_REQS_DESCRIPTION}')
+		raise
+	if key_length < KEY_LENGTH_MIN_BYTES or key_length > KEY_LENGTH_MAX_BYTES:
+		raise Exception(f'invalid key length. required: {KEY_LENGTH_REQS_DESCRIPTION}')
 
-	return length
+	return key_length
 
-# http://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks-in-python
-#
 def chunks(l, n):
-    """Yield successive n-sized chunks from l."""
+    '''yield successive n-sized chunks from l.'''
     for i in range(0, len(l), n):
         yield l[i:i+n]
 
 def run():
 	key_length = get_key_length_from_command_line()
-	if (key_length is None): return
 	
 	key_str = gen_urandom_hex_str(key_length).upper()
 
-	print(bytes.decode(key_str))
+	hex_key_str = '-'.join(bytes.decode(x) for x in chunks(key_str, 4))
+	b64_key_str = base64.b64encode(key_str).decode('ascii')
 
-	key_str_readable = '-'.join(bytes.decode(x) for x in chunks(key_str, 4))
-	print(key_str_readable)
+	print(f'raw: {bytes.decode(key_str)}')
+	print(f'hex: {hex_key_str}')
+	print(f'b64: {b64_key_str}')
 
 if __name__ == '__main__':
 	run()
