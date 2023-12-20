@@ -1,9 +1,6 @@
 import os
 import binascii
-
-KEY_TYPE_HEX = 'hex'
-KEY_TYPE_BASE64 = 'b64'
-SUPPORTED_KEY_TYPES = [KEY_TYPE_HEX, KEY_TYPE_BASE64]
+import base64
 
 KEY_LENGTH_MIN_BYTES=8
 KEY_LENGTH_MAX_BYTES=64
@@ -23,17 +20,8 @@ def get_key_length_from_command_line():
 
 	parser = argparse.ArgumentParser()
 	
-	parser.add_argument("key_type")	
 	parser.add_argument("key_length")
 	args = parser.parse_args()
-
-	key_type = None
-	try:
-		key_type = args.key_type 
-		print(f'{key_type} type key')
-	except Exception as e:
-		print(f'invalid key type: {args.key_type}, must be one of {SUPPORTED_KEY_TYPES}')
-		raise
 
 	key_length = None
 	try:
@@ -45,7 +33,7 @@ def get_key_length_from_command_line():
 	if key_length < KEY_LENGTH_MIN_BYTES or key_length > KEY_LENGTH_MAX_BYTES:
 		raise Exception(f'invalid key length. required: {KEY_LENGTH_REQS_DESCRIPTION}')
 
-	return key_type, key_length
+	return key_length
 
 def chunks(l, n):
     '''yield successive n-sized chunks from l.'''
@@ -53,20 +41,16 @@ def chunks(l, n):
         yield l[i:i+n]
 
 def run():
-	key_type, key_length = get_key_length_from_command_line()
+	key_length = get_key_length_from_command_line()
 	
+	key_str = gen_urandom_hex_str(key_length).upper()
 
-	key_str = None
-	key_str_readable = None
+	hex_key_str = '-'.join(bytes.decode(x) for x in chunks(key_str, 4))
+	b64_key_str = base64.b64encode(key_str).decode('ascii')
 
-	if key_type == KEY_TYPE_HEX:
-		key_str = gen_urandom_hex_str(key_length).upper()
-		key_str_readable = '-'.join(bytes.decode(x) for x in chunks(key_str, 4))
-	elif key_type == KEY_TYPE_BASE64:
-		pass
-
-	print(bytes.decode(key_str))
-	print(key_str_readable)
+	print(f'raw: {bytes.decode(key_str)}')
+	print(f'hex: {hex_key_str}')
+	print(f'b64: {b64_key_str}')
 
 if __name__ == '__main__':
 	run()
